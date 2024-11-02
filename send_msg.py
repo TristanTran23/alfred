@@ -16,12 +16,12 @@ def get_conversation_history(account_sid: str, auth_token: str, phone_number: st
     
     messages = client.messages.list(
         to=phone_number,
-        limit=1000
+        limit=10
     )
     
     messages_from = client.messages.list(
         from_=phone_number,
-        limit=1000
+        limit=10
     )
     
     all_messages = messages + messages_from
@@ -54,7 +54,7 @@ def prompt_gpt (prompt: str) -> str:
     output = alfred.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are an event organizer for a group of friends. You are helping them to find a place and time that works for everyone. You "},
+            {"role": "system", "content": "You are an event organizer for a group of friends. You are helping them to find a place and time that works for everyone. You will suggests "},
             {"role": "user", "content": "Hello"}
         ]
     )
@@ -63,3 +63,8 @@ def prompt_gpt (prompt: str) -> str:
 
 if __name__ == '__main__':
     prompt_gpt("Hello")
+    client.messages.create(
+        to="+16143448385",
+        from_="+18556049506",
+        body=prompt_gpt("Hello")
+    )
