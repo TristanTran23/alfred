@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 from twilio.rest import Client
+from typing import List, Dict
+from openai import OpenAI
 
 load_dotenv()
 
@@ -8,13 +10,9 @@ account_sid = os.getenv('TWILIO_ACCOUNT_SID')
 auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 
 client = Client(os.getenv('TWILIO_ACCOUNT_SID'), os.getenv('TWILIO_AUTH_TOKEN'))
-
-from twilio.rest import Client
-from datetime import datetime
-from typing import List, Dict
+alfred = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 def get_conversation_history(account_sid: str, auth_token: str, phone_number: str) -> List[Dict]:
-    client = Client(account_sid, auth_token)
     
     messages = client.messages.list(
         to=phone_number,
@@ -51,3 +49,17 @@ def print_conversation(conversation: List[Dict]) -> None:
         print(f"    {msg['body']}")
         print(f"    Status: {msg['status']}")
         print("-" * 50)
+
+def prompt_gpt (prompt: str) -> str:
+    output = alfred.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Hello"}
+        ]
+    )
+    print(output.choices[0].message.content)
+    return output.choices[0].message.content
+
+if __name__ == '__main__':
+    prompt_gpt("Hello")
